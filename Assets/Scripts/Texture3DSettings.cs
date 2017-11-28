@@ -27,8 +27,10 @@ public class Texture3DSettings : ScriptableObject
 	[Range(1, 10)]
 	public float	islandPow = 1f;
 	public bool		viewMask = false;
-	
-	public List< DensityPoint >	densityPoints = new List< DensityPoint >();
+    public AnimationCurve remapNoise;
+
+
+    public List< DensityPoint >	densityPoints = new List< DensityPoint >();
 
 	[MenuItem("Assets/Create/New Texture3DSettings")]
 	public static void CreateTextureSettings()
@@ -79,6 +81,9 @@ public class Texture3DSettings : ScriptableObject
 
 		ret = (perlin + adjust) * mid * multiplicator;
 
+        ret = remapNoise.Evaluate(ret);
+
+
 		if (viewMask)
 			ret = mid;
 
@@ -91,6 +96,9 @@ public class Texture3DSettings : ScriptableObject
 		int toX = (int)(textureSize / (numThreads) * (part + 1));
 
 		Debug.Log("Thread started from " + fromX + " to " + toX + ", part: " + part);
+		
+		try {
+		
 		for (int x = fromX; x < toX; x++)
 		{
 			for (int y = 0; y < textureSize; y++)
@@ -106,9 +114,14 @@ public class Texture3DSettings : ScriptableObject
 						if (f < cutoff)
 							fileBytes[ci] = 0;
 						else
-							fileBytes[ci] = System.Convert.ToByte(f * 255f);
+							fileBytes[ci] = System.Convert.ToByte(Mathf.Clamp(f * 255f, 0, 255));
 					}
 		}
+		
+		} catch (System.Exception e) {
+			Debug.LogError(e);
+		}
+
 		Debug.Log("Thread finished from " + fromX + " to " + toX + ", part: " + part);
 	}
 

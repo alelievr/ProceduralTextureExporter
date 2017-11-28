@@ -49,19 +49,22 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 	void ExportNoise(byte[] fileBytes)
 	{
 		running = true;
-		Thread[] threads = new Thread[numThreads];
+		List< Thread > threads = new List< Thread >();
 		for (int i = 0; i < numThreads; i++)
 		{
-			threads[i] = new Thread(() => {
+			Thread t = new Thread(() => {
 				settings.GenNoisePart(fileBytes, i, numThreads);
 			});
-			threads[i].Start();
+			threads.Add(t);
+			t.Start();
 			Thread.Sleep(20);
 		}
 
-		for (int i = 0; i < numThreads; i++)
-			threads[i].Join();
-		
+		foreach (var t in threads)
+		{
+			t.Join();
+		}
+
 		// File.WriteAllBytes("/goinfre/" + name + "-" + settings.textureSize + "s" + settings.channels +"c" + ".3Draw", fileBytes);
 		
 		string path = "Assets/Textures/texture-" + settings.textureSize + "s" + settings.channels + "c.asset";
@@ -103,6 +106,7 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 				}
 			
 		tex.SetPixels(colors);
+		tex.GenerateMipmaps();
 		tex.Apply();
 
 		AssetDatabase.CreateAsset(tex, path);
