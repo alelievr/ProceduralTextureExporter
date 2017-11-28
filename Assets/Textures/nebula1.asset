@@ -14,12 +14,12 @@ MonoBehaviour:
   textureSize: 256
   channels: 1
   seed: 42
-  scale: 170
+  scale: 150
   octaves: 6
   frequency: 2
   lacunarity: 1.6
   persistence: 0.96
-  cutoff: 0.193
+  cutoff: 0
   multiplicator: 1
   adjust: 0.3
   offset: {x: 3.62, y: 0.93, z: 0}
@@ -27,6 +27,30 @@ MonoBehaviour:
   islandCoreSize: 0.374
   islandPow: 5.97
   viewMask: 0
+  remapNoise:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0.029411763
+      outSlope: 0.029411763
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.7564103
+      value: 0.41057697
+      inSlope: 1.1429995
+      outSlope: 1.1429995
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   densityPoints:
   - position: {x: 0.31884342, y: -0.39022893, z: 0.0030465424}
     radius: 1

@@ -49,6 +49,9 @@ public class Texture3DGeneratorEditor : Editor
 	
 	void UpdatePreview()
 	{
+        if (noiseGenerator.settings == null)
+            return ;
+
 		if (oldTextureSize != noiseGenerator.settings.textureSize)
 		{
 			preview = new Texture2D(noiseGenerator.settings.textureSize, noiseGenerator.settings.textureSize, TextureFormat.RGBA32, false);
