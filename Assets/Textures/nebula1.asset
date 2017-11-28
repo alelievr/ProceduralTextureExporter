@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d1924dafed3048beb29d5074b3161d9, type: 3}
+  m_Name: nebula1
+  m_EditorClassIdentifier: 
+  textureSize: 256
+  channels: 1
+  seed: 42
+  scale: 170
+  octaves: 6
+  frequency: 2
+  lacunarity: 1.6
+  persistence: 0.96
+  cutoff: 0.193
+  multiplicator: 1
+  adjust: 0.3
+  offset: {x: 3.62, y: 0.93, z: 0}
+  islandScale: 0.461
+  islandCoreSize: 0.374
+  islandPow: 5.97
+  viewMask: 0
+  densityPoints:
+  - position: {x: 0.31884342, y: -0.39022893, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.3350871, y: -0.11290985, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.2713395, y: 0.31268618, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.07778674, y: 0.34548265, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.41133416, y: 0.35919788, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.36619568, y: 0.3570913, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.4061957, y: 0.05420947, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.34252036, y: -0.09034225, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.4186324, y: -0.23271525, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.33816522, y: -0.4078521, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.38642424, y: 0.27630323, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.32999212, y: 0.36956987, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.43175912, y: 0.19371109, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.22180724, y: 0.2526551, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.17115165, y: 0.3001337, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.18238392, y: 0.38680437, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.4368713, y: 0.24845454, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.29901797, y: 0.45722133, z: 0.10873464}
+    radius: 1
+  - position: {x: 0.36461037, y: -0.22449708, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.47938547, y: 0.12408498, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.3098783, y: 0.12412687, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.30895007, y: 0.021016516, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.3219148, y: 0.21770382, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.2364295, y: -0.062967174, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.40527266, y: -0.33449918, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.27479672, y: -0.29695508, z: 0.0030465424}
+    radius: 1
+  - position: {x: 0.27181345, y: -0.18969476, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.38119465, y: -0.045870125, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.36430395, y: -0.33845615, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.37409738, y: -0.27522174, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.35892838, y: -0.18667582, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.396531, y: -0.13685876, z: 0.0030465424}
+    radius: 1
+  - position: {x: -0.46624714, y: -0.015629977, z: 0.0030465424}
+    radius: 1
