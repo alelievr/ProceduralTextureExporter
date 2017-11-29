@@ -14,6 +14,8 @@ public class Texture3DSettings : ScriptableObject
 	public float	frequency = 2;
 	public float	lacunarity = 1;
 	public float	persistence = 1;
+
+	public bool		computeNormals = false;
 	
 	[Range(0, 1)]
 	public float	cutoff = .3f;
@@ -28,7 +30,6 @@ public class Texture3DSettings : ScriptableObject
 	public float	islandPow = 1f;
 	public bool		viewMask = false;
     public AnimationCurve remapNoise;
-
 
     public List< DensityPoint >	densityPoints = new List< DensityPoint >();
 
@@ -45,26 +46,8 @@ public class Texture3DSettings : ScriptableObject
 		ProjectWindowUtil.CreateAsset(ts, path);
 	}
 	
-	public float GetPoint(float x, float y, float z, int seed)
+	public float GetPoint(float p, float q, float r, int seed, AnimationCurve remap)
 	{
-		float p = (x - textureSize / 2) / scale + offset.x;
-		float q = (y - textureSize / 2) / scale + offset.y;
-		float r = (z - textureSize / 2) / scale + offset.z;
-		/*p = p * (ranges.map1.x - ranges.map0.x) / (ranges.loop1.x - ranges.loop0.x);
-		q = q * (ranges.map1.y - ranges.map0.y) / (ranges.loop1.y - ranges.loop0.y);
-		r = r * (ranges.map1.z - ranges.map0.z) / (ranges.loop1.z - ranges.loop0.z);
-		float dx = ranges.loop1.x - ranges.loop0.x;
-		float dy = ranges.loop1.y - ranges.loop0.y;
-		float dz = ranges.loop1.z - ranges.loop0.z;
-		float nx = ranges.loop0.x + Mathf.Cos(p * pi2) * dx / pi2;
-		float ny = ranges.loop0.x + Mathf.Sin(p * pi2) * dx / pi2;
-		float nz = ranges.loop0.y + Mathf.Cos(q * pi2) * dy / pi2;
-		float nw = ranges.loop0.y + Mathf.Sin(q * pi2) * dy / pi2;
-		float nu = ranges.loop0.z + Mathf.Cos(r * pi2) * dz / pi2;
-		float nv = ranges.loop0.z + Mathf.Sin(r * pi2) * dz / pi2;
-		return Simplex6D.GetValue(nx, ny, nz, nw, nu, nv, 42);*/
-
-		// return Simplex6D.GetValue(x, y, z, 45, 10, -23, 42);
 		float perlin = PerlinNoise3D.GenerateNoise(p, q, r, octaves, frequency, lacunarity, persistence, seed + this.seed);
 		float ret = 0;
 
@@ -81,23 +64,44 @@ public class Texture3DSettings : ScriptableObject
 
 		ret = (perlin + adjust) * mid * multiplicator;
 
-        ret = remapNoise.Evaluate(ret);
-
+        ret = remap.Evaluate(ret);
 
 		if (viewMask)
 			ret = mid;
+		
+		if (dist > 1)
+			return 0;
 
 		return ret;
 	}
+
+	public Vector3 GetNormal(float p, float q, float r)
+	{
+		Vector3 nearestPoint = Vector3.zero;
+		Vector3 point = new Vector3(p, q, r);
+		float min = 1e20f;
+
+		foreach (var dp in densityPoints)
+		{
+			float dst = Vector3.SqrMagnitude(dp.position - point);
+			if (dst < min)
+			{
+				nearestPoint = dp.position;
+				min = dst;
+			}
+		}
+
+		return (point - nearestPoint).normalized;
+	}
 	
-	public void GenNoisePart(byte[] fileBytes, float part, int numThreads)
+	public void GenNoisePart(byte[] fileBytes, float part, int numThreads, bool computeNormal)
 	{
 		int fromX = (int)(textureSize / (numThreads) * part);
 		int toX = (int)(textureSize / (numThreads) * (part + 1));
 
 		Debug.Log("Thread started from " + fromX + " to " + toX + ", part: " + part);
-		
-		try {
+
+		AnimationCurve threadSafeRemap = new AnimationCurve(remapNoise.keys);
 		
 		for (int x = fromX; x < toX; x++)
 		{
@@ -108,18 +112,28 @@ public class Texture3DSettings : ScriptableObject
 						int cx = x * textureSize * textureSize;
 						int cy = y * textureSize;
 						int cz = z;
-						int ci = (cx + cy + cz) * channels + i;
-						float f = GetPoint(x, y, z, i * 183);
+						int ci = (cx + cy + cz) * ((computeNormal) ? 4 : channels) + i;
+						float p = (x - textureSize / 2) / scale + offset.x;
+						float q = (y - textureSize / 2) / scale + offset.y;
+						float r = (z - textureSize / 2) / scale + offset.z;
+						float f = GetPoint(p, q, r, i * 183, threadSafeRemap);
 						
 						if (f < cutoff)
 							fileBytes[ci] = 0;
 						else
-							fileBytes[ci] = System.Convert.ToByte(Mathf.Clamp(f * 255f, 0, 255));
+						{
+							int val = Mathf.FloorToInt(Mathf.Clamp(f * 255f, 0, 255));
+							fileBytes[ci] = (byte)val;
+						}
+
+						if (computeNormal)
+						{
+							Vector3 norm = GetNormal(p, q, r);
+							fileBytes[ci + 1] = (byte)Mathf.FloorToInt(norm.x * 255f);
+							fileBytes[ci + 2] = (byte)Mathf.FloorToInt(norm.y * 255f);
+							fileBytes[ci + 3] = (byte)Mathf.FloorToInt(norm.z * 255f);
+						}
 					}
-		}
-		
-		} catch (System.Exception e) {
-			Debug.LogError(e);
 		}
 
 		Debug.Log("Thread finished from " + fromX + " to " + toX + ", part: " + part);

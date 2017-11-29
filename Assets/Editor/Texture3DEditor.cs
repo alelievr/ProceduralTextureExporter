@@ -65,8 +65,11 @@ public class Texture3DEditor : Editor
 		for (int x = 0; x < texture.width; x++)
 			for (int y = 0; y < texture.height; y++)
 			{
-				float f = pixels[x + y * texture.width + (z + texture.width / 2) * texture.width * texture.height].a;
-				previewX.SetPixel(x, y, new Color(f, f, f, 1));
+				Color c = pixels[x + y * texture.width + (z + texture.width / 2) * texture.width * texture.height];
+				if (c.r + c.b + c.b > 2.5f)
+					previewX.SetPixel(x, y, new Color(c.a, c.a, c.a, 1));
+				else
+					previewX.SetPixel(x, y, c);
 			}
 		previewX.Apply();
 	}
@@ -75,12 +78,14 @@ public class Texture3DEditor : Editor
 	{
 		Color[] pixels = texture.GetPixels();
 
-		Debug.Log("Col 1: " + pixels[50]);
 		for (int x = 0; x < texture.width; x++)
 			for (int z = 0; z < texture.height; z++)
 			{
-				float f = pixels[x + (y + texture.width / 2) * texture.width + z * texture.width * texture.height].a;
-				previewY.SetPixel(x, z, new Color(f, f, f, 1));
+				Color c = pixels[x + (y + texture.width / 2) * texture.width + z * texture.width * texture.height];
+				if (c.r + c.b + c.b > 2.5f)
+					previewY.SetPixel(x, z, new Color(c.a, c.a, c.a, 1));
+				else
+					previewY.SetPixel(x, z, c);
 			}
 		previewY.Apply();
 	}
@@ -92,8 +97,11 @@ public class Texture3DEditor : Editor
 		for (int y = 0; y < texture.width; y++)
 			for (int z = 0; z < texture.height; z++)
 			{
-				float f = pixels[(x + texture.height / 2) + y * texture.width + z * texture.width * texture.height].a;
-				previewZ.SetPixel(y, z, new Color(f, f, f, 1));
+				Color c = pixels[(x + texture.height / 2) + y * texture.width + z * texture.width * texture.height];
+				if (c.r + c.b + c.b > 2.5f)
+					previewZ.SetPixel(z, y, new Color(c.a, c.a, c.a, 1));
+				else
+					previewZ.SetPixel(z, y, c);
 			}
 		previewZ.Apply();
 	}

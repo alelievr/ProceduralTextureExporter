@@ -12,6 +12,8 @@ public class Texture3DSettingsEditor : Editor {
 	
 	[System.NonSerialized]
 	int							oldTextureSize = -1;
+
+	Vector3						normalTest;
 	
 	float						changedTime;
 	float						delayedChangeTimeout = .3f;
@@ -19,6 +21,8 @@ public class Texture3DSettingsEditor : Editor {
 	
 	float						saveTimeout = 2f;
 	float						lastSaveTime;
+	static bool					f = false;
+	static int					inst;
 
 	public void OnEnable()
 	{
@@ -27,12 +31,22 @@ public class Texture3DSettingsEditor : Editor {
 		preview = new Texture2D(settings.textureSize, settings.textureSize, TextureFormat.RGBA32, false);
 		preview.filterMode = FilterMode.Point;
 		UpdatePreview();
-
+	
+		if (f == false)
+			inst = GetHashCode();
+		else
+			return ;
+		f = true;
 		SceneView.onSceneGUIDelegate += OnSceneGUI;
+	}
+
+	void OnSceneGUI()
+	{
 	}
 
 	void OnDisable()
 	{
+		f = false;
 		SceneView.onSceneGUIDelegate -= OnSceneGUI;
 	}
 
@@ -74,6 +88,12 @@ public class Texture3DSettingsEditor : Editor {
 			changedTime = Time.time;
 		}
 
+		//draw normal preview:
+		Vector3 normalDir = settings.GetNormal(normalTest.x, normalTest.y, normalTest.z);
+		if (inst == GetHashCode())
+		Handles.ArrowHandleCap(0, normalTest, Quaternion.LookRotation(normalDir), .1f, e.type);
+		normalTest = Handles.FreeMoveHandle(normalTest, Quaternion.identity, .02f, Vector3.zero, Handles.DotHandleCap);
+
 		if (e.type == EventType.KeyDown && e.keyCode == KeyCode.N)
 		{
 			settings.densityPoints.Add(last);
@@ -105,21 +125,21 @@ public class Texture3DSettingsEditor : Editor {
 			preview = new Texture2D(settings.textureSize, settings.textureSize, TextureFormat.RGBA32, false);
 			preview.filterMode = FilterMode.Point;
 		}
-		
+
 		for (int x = 0; x < settings.textureSize; x++)
 			for (int y = 0; y < settings.textureSize; y++)
 			{
 				Color c = Color.black;
 				for (int i = 0 ; i < settings.channels; i++)
 				{
-					float f = settings.GetPoint(x - settings.textureSize * i, y - settings.textureSize * i, settings.textureSize / 2, 0);
+					float f = settings.GetPoint(x - settings.textureSize * i, y - settings.textureSize * i, settings.textureSize / 2, settings.seed, settings.remapNoise);
 
 					if (f < settings.cutoff)
 						c[i] = 0;
 					else
 						c[i] = f;
 				}
-				preview.SetPixel(x, y, Color.white * c);
+				preview.SetPixel(x, y, c);
 			}
 		preview.Apply();
 	}

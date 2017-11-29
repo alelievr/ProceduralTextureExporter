@@ -65,7 +65,7 @@ public class Texture3DGeneratorEditor : Editor
 				Color c = Color.black;
 				for (int i = 0 ; i < noiseGenerator.settings.channels; i++)
 				{
-					float f = noiseGenerator.settings.GetPoint(x - noiseGenerator.settings.textureSize * i, y - noiseGenerator.settings.textureSize * i, noiseGenerator.settings.textureSize / 2 + zPosition, 0);
+					float f = noiseGenerator.settings.GetPoint(x - noiseGenerator.settings.textureSize * i, y - noiseGenerator.settings.textureSize * i, noiseGenerator.settings.textureSize / 2 + zPosition, 0, noiseGenerator.settings.remapNoise);
 
 					if (f < noiseGenerator.settings.cutoff)
 						c[i] = 0;

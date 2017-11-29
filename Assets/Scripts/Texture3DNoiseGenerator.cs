@@ -18,42 +18,26 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 {
 	public Texture3DSettings	settings;
 	public int					numThreads;
-
-	float	progress = 0;
-
-	[SerializeField, HideInInspector]
-	bool			running = false;
+	public string				textureName = "nebula-1";
 
 	public void Export()
 	{
-		if (running)
-		{
-			Debug.Log("another export is alredy in progress");
-			return ;
-		}
-		byte[]	fileBytes = new byte[settings.textureSize * settings.textureSize * settings.textureSize * settings.channels];
+		byte[]	fileBytes = new byte[settings.textureSize * settings.textureSize * settings.textureSize * ((settings.computeNormals) ? 4 : settings.channels)];
 
 		ExportNoise(fileBytes);
 	}
 
 	public void Stop()
 	{
-		running = false;
-	}
-
-	void OnDisable()
-	{
-		running = false;
 	}
 
 	void ExportNoise(byte[] fileBytes)
 	{
-		running = true;
 		List< Thread > threads = new List< Thread >();
 		for (int i = 0; i < numThreads; i++)
 		{
 			Thread t = new Thread(() => {
-				settings.GenNoisePart(fileBytes, i, numThreads);
+				settings.GenNoisePart(fileBytes, i, numThreads, settings.computeNormals);
 			});
 			threads.Add(t);
 			t.Start();
@@ -67,21 +51,20 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 
 		// File.WriteAllBytes("/goinfre/" + name + "-" + settings.textureSize + "s" + settings.channels +"c" + ".3Draw", fileBytes);
 		
-		string path = "Assets/Textures/texture-" + settings.textureSize + "s" + settings.channels + "c.asset";
+		string path = "Assets/Textures/" + textureName + ".asset";
 
 		path = AssetDatabase.GenerateUniqueAssetPath(path);
 
 		ExportTexture(fileBytes, path);
 
 		Debug.Log("Done !");
-		running = false;
 	}
 
 	void ExportTexture(byte[] fileBytes, string path)
 	{
 		Color[] colors = new Color[settings.textureSize * settings.textureSize * settings.textureSize + 10];
 
-		TextureFormat texFormat = (settings.channels == 1) ? TextureFormat.Alpha8 : ((settings.channels == 2) ? TextureFormat.RG16 : (settings.channels == 3) ? TextureFormat.RGB24 : TextureFormat.RGBA32);
+		TextureFormat texFormat = (settings.channels == 1 && !settings.computeNormals) ? TextureFormat.Alpha8 : ((settings.channels == 2) ? TextureFormat.RG16 : (settings.channels == 3) ? TextureFormat.RGB24 : TextureFormat.RGBA32);
 		Texture3D	tex = new Texture3D(settings.textureSize, settings.textureSize, settings.textureSize, texFormat, true);
 		tex.filterMode = FilterMode.Trilinear;
 
@@ -97,7 +80,13 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 					Color c = new Color();
 
 					if (settings.channels == 1)
-						c[3] = c[2] = c[1] = c[0] = (float)(fileBytes[ci]) / 255f;
+					{
+						if (settings.computeNormals)
+							for (int i = 0; i < 4; i++)
+								c[i] = (float)(fileBytes[ci + i]) / 255f;
+						else
+							c[3] = c[2] = c[1] = c[0] = (float)(fileBytes[ci]) / 255f;
+					}
 					else
 						for (int i = 0; i < settings.channels; i++)
 							c[i] = (float)(fileBytes[ci + i]) / 255f;
@@ -106,10 +95,10 @@ public class Texture3DNoiseGenerator : MonoBehaviour
 				}
 			
 		tex.SetPixels(colors);
-		tex.GenerateMipmaps();
 		tex.Apply();
 
 		AssetDatabase.CreateAsset(tex, path);
+		EditorGUIUtility.PingObject(tex);
 	}
 
 	void Update()

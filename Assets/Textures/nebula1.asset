@@ -19,6 +19,7 @@ MonoBehaviour:
   frequency: 2
   lacunarity: 1.6
   persistence: 0.96
+  computeNormals: 0
   cutoff: 0
   multiplicator: 1
   adjust: 0.3
